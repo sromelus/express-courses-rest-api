@@ -1,4 +1,22 @@
 'use strict';
+const sequelize = require('sequelize');
+
+const Sequelize = require('sequelize');
+
+const sequelizee = new Sequelize({
+  dialect: 'sqlite',
+  storage: 'fsjstd-restapi.db'
+})
+
+
+// (async () => {
+//   try {
+//     await sequelizee.authenticate();
+//     console.log('Connection to the database successful!');
+//   } catch (error) {
+//     console.error('Error connecting to the database: ', error);
+//   }
+// })();
 
 // load modules
 const express = require('express');
@@ -16,7 +34,13 @@ app.use(morgan('dev'));
 // TODO setup your api routes here
 
 // setup a friendly greeting for the root route
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  try {
+    await sequelizee.authenticate();
+    console.log('Connection to the database successful!');
+  } catch (error) {
+    console.error('Error connecting to the database: ', error);
+  }
   res.json({
     message: 'Welcome to the REST API project!',
   });

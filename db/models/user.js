@@ -9,7 +9,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    fistName: {
+    firstName: {
       type: Sequelize.STRING,
       allowNull: false,
     },
@@ -29,9 +29,9 @@ module.exports = (sequelize) => {
 
   User.associate = (models) => {
     User.hasMany(models.Course, {
-      as: 'director',
+      as: 'user',
       foreignKey: {
-        fieldName: 'directorPersonId',
+        fieldName: 'userId',
         allowNull: false,
       },
     });

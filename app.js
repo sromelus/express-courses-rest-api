@@ -2,10 +2,21 @@
 
 const { sequelize, models } = require('./db');
 
-const { Person, Movie } = models;
+const {  Course, User } = models;
 
 const express = require('express');
 const morgan = require('morgan');
+
+/* Handler function to wrap each route. */
+function asyncHandler(cb){
+  return async(req, res, next) => {
+    try {
+      await cb(req, res, next)
+    } catch(error){
+      res.status(500).send(error);
+    }
+  }
+}
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -24,6 +35,15 @@ app.get('/', async (req, res) => {
   try {
     await sequelize.authenticate();
     console.log('Connection to the database successful!');
+    const users = await User.findAll({
+      include: [
+        {
+         model: Course
+       }
+     ]
+    })
+    console.log(users.map(user => user.get({ plain: true })));
+
   } catch (error) {
     console.error('Error connecting to the database: ', error);
   }

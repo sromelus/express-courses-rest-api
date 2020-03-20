@@ -2,6 +2,7 @@
 const Sequelize = require('sequelize');
 
 module.exports = (sequelize) => {
+  console.log('course');
   class Course extends Sequelize.Model {}
   Course.init({
     id: {
@@ -25,15 +26,15 @@ module.exports = (sequelize) => {
     },
   }, { sequelize });
 
-  Course.associate = (models) => {
-    Course.belongsTo(models.Person, {
-      as: 'user',
-      foreignKey: {
-        fieldName: 'userId',
-        allowNull: false,
-      },
-    });
-  };
+  // Course.associate = (models) => {
+  //   Course.belongsTo(models.Person, {
+  //     as: 'user',
+  //     foreignKey: {
+  //       fieldName: 'userId',
+  //       allowNull: false,
+  //     },
+  //   });
+  // };
 
   return Course;
 };

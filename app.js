@@ -36,11 +36,11 @@ app.get('/', async (req, res) => {
     await sequelize.authenticate();
     console.log('Connection to the database successful!');
     const users = await User.findAll({
-      include: [
-        {
-         model: Course
-       }
-     ]
+     //  include: [
+     //    {
+     //     model: Course
+     //   }
+     // ]
     })
     console.log(users.map(user => user.get({ plain: true })));
 

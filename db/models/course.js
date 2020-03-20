@@ -26,15 +26,15 @@ module.exports = (sequelize) => {
     },
   }, { sequelize });
 
-  // Course.associate = (models) => {
-  //   Course.belongsTo(models.Person, {
-  //     as: 'user',
-  //     foreignKey: {
-  //       fieldName: 'userId',
-  //       allowNull: false,
-  //     },
-  //   });
-  // };
+  Course.associate = (models) => {
+    Course.belongsTo(models.Person, {
+      as: 'user',
+      foreignKey: {
+        fieldName: 'userId',
+        allowNull: false,
+      },
+    });
+  };
 
   return Course;
 };

@@ -2,7 +2,7 @@
 
 const { sequelize, models } = require('./db');
 
-const {  Course, User } = models;
+const {  User, Course  } = models;
 
 const express = require('express');
 const morgan = require('morgan');
@@ -36,11 +36,12 @@ app.get('/', async (req, res) => {
     await sequelize.authenticate();
     console.log('Connection to the database successful!');
     const users = await User.findAll({
-     //  include: [
-     //    {
-     //     model: Course
-     //   }
-     // ]
+      include: [
+        {
+         model: Course,
+         as: 'user'
+       }
+     ]
     })
     console.log(users.map(user => user.get({ plain: true })));
 

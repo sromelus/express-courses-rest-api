@@ -2,7 +2,6 @@
 const Sequelize = require('sequelize');
 
 module.exports = (sequelize) => {
-  console.log('user');
   class User extends Sequelize.Model {}
   User.init({
     id: {
@@ -28,15 +27,24 @@ module.exports = (sequelize) => {
     }
   }, { sequelize });
 
-  // User.associate = (models) => {
-  //   User.hasMany(models.Course, {
-  //     as: 'user',
-  //     foreignKey: {
-  //       fieldName: 'userId',
-  //       allowNull: false,
-  //     },
-  //   });
-  // };
+  User.associate = (models) => {
+    User.hasMany(models.Course, {
+      as: 'user',
+      foreignKey: {
+        fieldName: 'userId',
+        allowNull: false
+      },
+    });
+  };
 
   return User;
 };
+
+
+// , {
+//   as: 'user',
+//   foreignKey: {
+//     fieldName: 'userId',
+//     allowNull: false,
+//   },
+// }

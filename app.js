@@ -1,22 +1,10 @@
 'use strict';
 
-const { sequelize, models } = require('./db');
-
-const {  User, Course  } = models;
-
 const express = require('express');
+const routes = require('./routes')
 const morgan = require('morgan');
-
-/* Handler function to wrap each route. */
-function asyncHandler(cb){
-  return async(req, res, next) => {
-    try {
-      await cb(req, res, next)
-    } catch(error){
-      res.status(500).send(error);
-    }
-  }
-}
+const users = require('./routes/users');
+const courses = require('./routes/courses');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -27,32 +15,18 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
-// TODO setup your api routes here
-
-// setup a friendly greeting for the root route
-app.get('/', async (req, res) => {
-
-  try {
-    await sequelize.authenticate();
-    console.log('Connection to the database successful!');
-    const users = await User.findAll({
-      include: [
-        {
-         model: Course,
-         as: 'user'
-       }
-     ]
-    })
-    console.log(users.map(user => user.get({ plain: true })));
-
-  } catch (error) {
-    console.error('Error connecting to the database: ', error);
-  }
-
+// Setup a friendly greeting for the root route.
+app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to the REST API project!',
+    message: 'Welcome to the course REST API Express!',
   });
 });
+
+// app.use('/api', routes)
+app.use('/api/users', users)
+app.use('/api/courses', courses)
+
+
 
 // send 404 if no other route matched
 app.use((req, res) => {

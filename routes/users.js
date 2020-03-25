@@ -32,6 +32,21 @@ const authenticateUser = async(req, res, next) => {
   if(credentials){
     const users = await User.findAll()
     const user = users.find(user => user.emailAddress === credentials.name);
+
+    if(user){
+      const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
+
+      if (authenticated) {
+        console.log(`Authentication succefull for user with email: ${user.emailAddress}`);
+        req.currentUser = user;
+      } else {
+        console.log(`Authentication failure for user with email: ${user.emailAddress}`);
+      }
+
+    } else {
+       message = `User not found for email: ${user.emailAddress}`;
+    }
+
   } else {
     message = 'Auth header not found';
   }
@@ -46,12 +61,11 @@ const authenticateUser = async(req, res, next) => {
 
 
 router.get('/', authenticateUser, async (req, res) => {
-  try {
-    const users = await User.findAll();
-    res.json(users);
-  } catch (e) {
-    throw e
-  }
+    const user = req.currentUser;
+    res.json({
+      name: `${user.firstName} ${user.lastName}`,
+      email: `${user.emailAddress}`
+    });
 });
 
 router.post('/', authenticateUser, async(req, res) => {

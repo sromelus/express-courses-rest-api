@@ -39,7 +39,7 @@ router.get('/:id', async (req, res) => {
   res.status(200).json(course)
 })
 
-const courseValidaor = [
+const courseValidator = [
   check("title", 'Please provide a "title"').exists(),
   check("description", 'Please provide a "description"').exists(),
   check("estimatedTime", 'Please provide a "estimatedTime"').exists(),
@@ -47,32 +47,51 @@ const courseValidaor = [
   check("userId", 'Please provide a "userId"').exists()
 ]
 
-router.post('/', async (req, res) => {
-  const course = await Course.create({
-    title: req.body.title,
-    description: req.body.description,
-    estimatedTime: req.body.estimatedTime,
-    materialsNeeded: req.body.materialsNeeded,
-    userId: req.body.userId
-  })
-  res.status(201).json(course)
+router.post('/', courseValidator, async (req, res) => {
+
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    const errorMessages = errors.array().map(error => error.msg);
+    res.status(400).json({ message: errorMessages })
+  } else {
+    const course = await Course.create({
+      title: req.body.title,
+      description: req.body.description,
+      estimatedTime: req.body.estimatedTime,
+      materialsNeeded: req.body.materialsNeeded,
+      userId: req.body.userId
+    })
+    res.status(201).json(course)
+  }
 })
 
+router.put('/:id', async (req, res) => {
+  const course = await Course.findByPk(req.params.id);
+
+  if(course){
+    await Course.update({
+      title: req.body.title,
+      description: req.body.description,
+      estimatedTime: req.body.estimatedTime,
+      materialsNeeded: req.body.materialsNeeded,
+      userId: req.body.userId
+    },
+    {
+      where: {
+        id: req.params.id
+      }
+    })
+    res.status(204).end();
+  } else {
+    res.status(404).json({'error': "Not Found"})
+  }
+})
+
+router.delete('/:id', async (req, res) => {
+  const course = await Course.findByPk(req.params.id);
+  await course.destroy();
+  res.status(204).end();
+})
 
 module.exports = router;
-
-
-// GET /api/courses 200 - Returns a list of courses (including the user that owns each course)
-// GET /api/courses/:id 200 - Returns a the course (including the user that owns the course) for the provided course ID
-// POST /api/courses 201 - Creates a course, sets the Location header to the URI for the course, and returns no content
-// PUT /api/courses/:id 204 - Updates a course and returns no content
-// DELETE /api/courses/:id 204 - Deletes a course and returns no content
-
-// const courses = await Course.findAll({
-//       include: [
-//         {
-//          model: User,
-//          as: 'userCourse'
-//        }
-//      ]
-//     })

@@ -17,19 +17,33 @@ function asyncHandler(cb){
     try {
       await cb(req, res, next)
     } catch(error){
-      res.status(500).send(error);
+        res.status(500).json({error});
     }
   }
 }
 
+// router.post('/', async(req, res) => {
+//   const user = req.body;
+//
+//   const nUser = await User.create({
+//     firstName: user.firstName,
+//     lastName: user.lastName,
+//     emailAddress: user.emailAddress,
+//     password: user.password
+//   });
+//   res.status(201).end()
+// });
+
+
+
 const authenticateUser = async(req, res, next) => {
   let message = null;
+  let isCredentialsNotEmpty = null;
 
   const credentials = auth(req);
 
-  console.log(credentials);
-
   if(credentials){
+
     const users = await User.findAll()
     const user = users.find(user => user.emailAddress === credentials.name);
 
@@ -37,14 +51,13 @@ const authenticateUser = async(req, res, next) => {
       const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
 
       if (authenticated) {
-        console.log(`Authentication succefull for user with email: ${user.emailAddress}`);
+        console.log(`Authentication succefull for user with email: ${credentials.name}`);
         req.currentUser = user;
       } else {
-        console.log(`Authentication failure for user with email: ${user.emailAddress}`);
+        message = `Authentication failure for user with email: ${credentials.name}`;
       }
-
     } else {
-       message = `User not found for email: ${user.emailAddress}`;
+       message = `User not found for username: ${credentials.name}`;
     }
 
   } else {
@@ -68,10 +81,40 @@ router.get('/', authenticateUser, async (req, res) => {
     });
 });
 
-router.post('/', authenticateUser, async(req, res) => {
-  const users = await User.findAll();
+router.post('/', [
+  check('firstName', 'Please provide a value for "First Name"')
+    .exists(),
+  check('lastName', 'Please provide a value for "Last Name"')
+    .exists(),
+  check('emailAddress', 'Please provide a value for "Email Address"')
+    .isEmail(),
+  check('password', 'Please provide a value for "Password"')
+    .exists()
+], asyncHandler(async(req, res) => {
 
-});
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    const errorMessages = errors.array().map(error => error.msg);
+    res.status(400).json({message: errorMessages })
+  } else {
+    const user = req.body;
+    user.password = bcryptjs.hashSync(user.password);
+
+      const newUser = await User.create({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        emailAddress: user.emailAddress,
+        password: user.password
+      });
+
+   res.status(201).end()
+  }
+}));
+
+
+
+
 
 
 // router.get('/', async (req, res) => {

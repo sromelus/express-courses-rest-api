@@ -7,7 +7,7 @@ const bcryptjs = require('bcryptjs');
 const router = express.Router();
 
 const { sequelize, models } = require('../db');
-const {  User, Course  } = models;
+const {  User  } = models;
 
 router.use(express.json());
 
@@ -22,21 +22,14 @@ function asyncHandler(cb){
   }
 }
 
-// router.post('/', async(req, res) => {
-//   const user = req.body;
-//
-//   const nUser = await User.create({
-//     firstName: user.firstName,
-//     lastName: user.lastName,
-//     emailAddress: user.emailAddress,
-//     password: user.password
-//   });
-//   res.status(201).end()
-// });
-
-
-
 const authenticateUser = async(req, res, next) => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to the database successful!');
+  } catch (error) {
+    console.error('Error connecting to the database: ', error);
+  }
+
   let message = null;
   let isCredentialsNotEmpty = null;
 
@@ -71,6 +64,7 @@ const authenticateUser = async(req, res, next) => {
     next();
   }
 };
+
 
 
 router.get('/', authenticateUser, async (req, res) => {

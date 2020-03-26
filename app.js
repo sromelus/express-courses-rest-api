@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// app.use('/api', routes)
+app.use('/api', routes)
 app.use('/api/users', users)
 app.use('/api/courses', courses)
 

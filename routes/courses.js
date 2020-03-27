@@ -89,6 +89,7 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
 
     if(course){
       await Course.update({
+      //The validation middleware for course overrides the "||".  "||" / "OR" Allows to update just one property
         title: req.body.title || course.title,
         description: req.body.description || course.description,
         estimatedTime: req.body.estimatedTime || course.estimatedTime,

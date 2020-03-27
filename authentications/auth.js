@@ -59,8 +59,6 @@ const courseInputsValidator = [
   //Used "express validator's" check method to validate inputs
   check("title", 'Please provide a "title"').exists(),
   check("description", 'Please provide a "description"').exists(),
-  check("estimatedTime", 'Please provide a "estimatedTime"').exists(),
-  check("materialsNeeded", 'Please provide a "materialsNeeded"').exists(),
   check("userId", 'Please provide a "userId"').exists()
 ]
 

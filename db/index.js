@@ -68,6 +68,4 @@ Object.keys(models).forEach((modelName) => {
   }
 });
 
-// console.log(Object.keys(models));
-
 module.exports = db;

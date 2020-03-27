@@ -8,6 +8,7 @@ const { User, Course  } = models;
 
 router.use(express.json());
 
+/* Handler function to wrap each route. */
 function asyncHandler(cb){
   return async(req, res, next) => {
     try {
@@ -18,7 +19,8 @@ function asyncHandler(cb){
   }
 }
 
-router.get('/', async (req, res) => {
+//Returns a list of courses (including the user that owns each course)
+router.get('/', asyncHandler(async (req, res) => {
   const courses = await Course.findAll({
     include: [{
       model: User,
@@ -26,9 +28,10 @@ router.get('/', async (req, res) => {
     }]
   })
   res.status(200).json(courses)
-})
+}));
 
-router.get('/:id', async (req, res) => {
+//Returns a the course (including the user that owns the course) for the provided course ID
+router.get('/:id', asyncHandler(async (req, res) => {
   const courses = await Course.findAll({
     include: [{
       model: User,
@@ -37,9 +40,10 @@ router.get('/:id', async (req, res) => {
   })
   const course = courses.find(course => course.id == req.params.id)
   res.status(200).json(course)
-})
+}));
 
-const courseValidator = [
+const courseInputsValidator = [
+  //Used "express validator's" check method to validate inputs
   check("title", 'Please provide a "title"').exists(),
   check("description", 'Please provide a "description"').exists(),
   check("estimatedTime", 'Please provide a "estimatedTime"').exists(),
@@ -47,7 +51,9 @@ const courseValidator = [
   check("userId", 'Please provide a "userId"').exists()
 ]
 
-router.post('/', courseValidator, async (req, res) => {
+
+//Creates a course, check for validation errors
+router.post('/', courseInputsValidator, asyncHandler(async (req, res) => {
 
   const errors = validationResult(req);
 
@@ -64,9 +70,10 @@ router.post('/', courseValidator, async (req, res) => {
     })
     res.status(201).json(course)
   }
-})
+}));
 
-router.put('/:id', async (req, res) => {
+//Updates a course
+router.put('/:id', asyncHandler(async(req, res) => {
   const course = await Course.findByPk(req.params.id);
 
   if(course){
@@ -86,12 +93,13 @@ router.put('/:id', async (req, res) => {
   } else {
     res.status(404).json({'error': "Not Found"})
   }
-})
+}));
 
-router.delete('/:id', async (req, res) => {
+// Deletes a course
+router.delete('/:id', asyncHandler(async (req, res) => {
   const course = await Course.findByPk(req.params.id);
   await course.destroy();
   res.status(204).end();
-})
+}));
 
 module.exports = router;

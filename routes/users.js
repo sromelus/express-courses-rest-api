@@ -5,7 +5,7 @@ const { check, validationResult } = require('express-validator');
 const auth = require('basic-auth');
 const bcryptjs = require('bcryptjs');
 const router = express.Router();
-
+//import models and sequelize from  the db folder
 const { sequelize, models } = require('../db');
 const {  User  } = models;
 
@@ -23,6 +23,7 @@ function asyncHandler(cb){
 }
 
 const authenticateUser = async(req, res, next) => {
+// Check the Database connection.
   try {
     await sequelize.authenticate();
     console.log('Connection to the database successful!');
@@ -33,6 +34,7 @@ const authenticateUser = async(req, res, next) => {
   let message = null;
   let isCredentialsNotEmpty = null;
 
+  // Parse the user's credentials from the Authorization header.
   const credentials = auth(req);
 
   if(credentials){
@@ -41,6 +43,7 @@ const authenticateUser = async(req, res, next) => {
     const user = users.find(user => user.emailAddress === credentials.name);
 
     if(user){
+      // Check if the propective user's password match the user password in the database
       const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
 
       if (authenticated) {
@@ -65,27 +68,26 @@ const authenticateUser = async(req, res, next) => {
   }
 };
 
-
-
-router.get('/', authenticateUser, async (req, res) => {
+router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     const user = req.currentUser;
     res.json({
       name: `${user.firstName} ${user.lastName}`,
       email: `${user.emailAddress}`
     });
-});
+}));
 
-router.post('/', [
-  check('firstName', 'Please provide a value for "First Name"')
-    .exists(),
-  check('lastName', 'Please provide a value for "Last Name"')
-    .exists(),
-  check('emailAddress', 'Please provide a value for "Email Address"')
-    .isEmail(),
-  check('password', 'Please provide a value for "Password"')
-    .exists()
-], asyncHandler(async(req, res) => {
+const userInputsValidator = [
+  //Used "express validator's" check method to validate inputs
+    check('firstName', 'Please provide a value for "First Name"').exists(),
+    check('lastName', 'Please provide a value for "Last Name"').exists(),
+    check('emailAddress', 'Please provide a value for "Email Address"').isEmail(),
+    check('password', 'Please provide a value for "Password"').exists()
+  ]
 
+
+router.post('/', userInputsValidator, asyncHandler(async(req, res) => {
+  
+  //Used "express validator's" validationResult method to check for possible errors
   const errors = validationResult(req);
 
   if(!errors.isEmpty()){
@@ -93,6 +95,7 @@ router.post('/', [
     res.status(400).json({message: errorMessages })
   } else {
     const user = req.body;
+    //Use bcrypt to hash user password when they sign up
     user.password = bcryptjs.hashSync(user.password);
 
       const newUser = await User.create({
@@ -105,47 +108,5 @@ router.post('/', [
    res.status(201).end()
   }
 }));
-
-
-
-
-
-
-// router.get('/', async (req, res) => {
-//   try {
-//     await sequelize.authenticate();
-//     console.log('Connection to the database successful!');
-//     const users = await User.findAll({
-//       include: [
-//         {
-//          model: Course,
-//          as: 'userCourse'
-//        }
-//      ]
-//     })
-//     // console.log(users.map(user => user.get({ plain: true })));
-//
-//
-//     const courses = await Course.findAll({
-//       include: [
-//         {
-//          model: User,
-//          as: 'userCourse'
-//        }
-//      ]
-//     })
-//     // console.log(courses.map(course => course.get({ plain: true })));
-//
-//     res.json({users, courses})
-//     // console.log(users);
-//
-//   } catch (error) {
-//     console.error('Error connecting to the database: ', error);
-//   }
-//
-//   // res.json({
-//   //   message: 'Welcome to the REST API project!',
-//   // });
-// });
 
 module.exports = router;

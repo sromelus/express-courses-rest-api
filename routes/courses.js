@@ -3,6 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const auth = require('basic-auth');
+const bcryptjs = require('bcryptjs');
 const { sequelize, models } = require('../db');
 const { User, Course  } = models;
 
@@ -18,6 +20,55 @@ function asyncHandler(cb){
     }
   }
 }
+
+//Middleware function to get the user credentials from the Authorization header set on the request.
+const authenticateUser = async(req, res, next) => {
+// Check the Database connection.
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to the database successful!');
+  } catch (error) {
+    console.error('Error connecting to the database: ', error);
+  }
+
+  let message = null;
+  let isCredentialsNotEmpty = null;
+
+  //Parse the user's credentials from the Authorization header.
+  const credentials = auth(req);
+
+  console.log(credentials);
+
+  if(credentials){
+
+    const users = await User.findAll()
+    const user = users.find(user => user.emailAddress === credentials.name);
+
+    if(user){
+      // Check if the propective user's password match the user password in the database
+      const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
+
+      if (authenticated) {
+        console.log(`Authentication succefull for user with email: ${credentials.name}`);
+        req.currentUser = user;
+      } else {
+        message = `Authentication failure for user with email: ${credentials.name}`;
+      }
+    } else {
+       message = `User not found for username: ${credentials.name}`;
+    }
+
+  } else {
+    message = 'Auth header not found';
+  }
+
+  if(message){
+    console.warn(message);
+    res.status(401).json({ message: 'Access Denied'})
+  } else {
+    next();
+  }
+};
 
 const courseInputsValidator = [
   //Used "express validator's" check method to validate inputs
@@ -56,7 +107,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
 
 //Creates a course, check for validation errors
-router.post('/', courseInputsValidator, asyncHandler(async (req, res) => {
+router.post('/', authenticateUser, courseInputsValidator, asyncHandler(async (req, res) => {
 
   const errors = validationResult(req);
 
@@ -76,7 +127,7 @@ router.post('/', courseInputsValidator, asyncHandler(async (req, res) => {
 }));
 
 //Updates a course
-router.put('/:id', courseInputsValidator, asyncHandler(async(req, res) => {
+router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(req, res) => {
 
   //Used "express validator's" validationResult method to check for possible errors
   const errors = validationResult(req);
@@ -85,7 +136,7 @@ router.put('/:id', courseInputsValidator, asyncHandler(async(req, res) => {
     const errorMessages = errors.array().map(error => error.msg);
     res.status(400).json({ message: errorMessages })
   } else {
-    
+
  // Retrieve the course and update the specified field, if there is a course with that ID
     const course = await Course.findByPk(req.params.id);
 
@@ -110,7 +161,7 @@ router.put('/:id', courseInputsValidator, asyncHandler(async(req, res) => {
 }));
 
 // Deletes a course
-router.delete('/:id', asyncHandler(async (req, res) => {
+router.delete('/:id', authenticateUser, asyncHandler(async (req, res) => {
   const course = await Course.findByPk(req.params.id);
   await course.destroy();
   res.status(204).end();

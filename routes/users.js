@@ -22,6 +22,7 @@ function asyncHandler(cb){
   }
 }
 
+//Middleware function to get the user credentials from the Authorization header set on the request.
 const authenticateUser = async(req, res, next) => {
 // Check the Database connection.
   try {
@@ -34,7 +35,7 @@ const authenticateUser = async(req, res, next) => {
   let message = null;
   let isCredentialsNotEmpty = null;
 
-  // Parse the user's credentials from the Authorization header.
+  //Parse the user's credentials from the Authorization header.
   const credentials = auth(req);
 
   if(credentials){

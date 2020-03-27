@@ -3,6 +3,7 @@
 
 This project is an API that manages a mock up school database. The api currently manages two main datasets users and courses.
 
+
 ## Getting Started
 
 To get up and running with this project, run the following commands from the root of the folder that contains this README file.

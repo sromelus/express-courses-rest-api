@@ -68,6 +68,17 @@ const authenticateUser = async(req, res, next) => {
   }
 };
 
+const userInputsValidator = [
+  //Used "express validator's" check method to validate inputs
+    check('firstName', 'Please provide a value for "First Name"').exists(),
+    check('lastName', 'Please provide a value for "Last Name"').exists(),
+    check('emailAddress', 'Please provide a value for "Email Address"').isEmail(),
+    check('password', 'Please provide a value for "Password"').exists()
+]
+
+
+//----------------------------All Routes------------------------------
+
 router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     const user = req.currentUser;
     res.json({
@@ -76,17 +87,9 @@ router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     });
 }));
 
-const userInputsValidator = [
-  //Used "express validator's" check method to validate inputs
-    check('firstName', 'Please provide a value for "First Name"').exists(),
-    check('lastName', 'Please provide a value for "Last Name"').exists(),
-    check('emailAddress', 'Please provide a value for "Email Address"').isEmail(),
-    check('password', 'Please provide a value for "Password"').exists()
-  ]
-
 
 router.post('/', userInputsValidator, asyncHandler(async(req, res) => {
-  
+
   //Used "express validator's" validationResult method to check for possible errors
   const errors = validationResult(req);
 

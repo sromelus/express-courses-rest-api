@@ -2,9 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const auth = require('basic-auth');
-const bcryptjs = require('bcryptjs');
+const { validationResult } = require('express-validator');
 
 //import models and sequelize from  the db folder
 const { sequelize, models } = require('../db');
@@ -41,15 +39,23 @@ router.get('/', asyncHandler(async (req, res) => {
 }));
 
 //Returns a the course (including the user that owns the course) for the provided course ID
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id', asyncHandler(async (req, res, next) => {
+
   const courses = await Course.findAll({
     include: [{
       model: User,
       as: 'userCourse'
     }]
   })
+
   const course = courses.find(course => course.id == req.params.id)
-  res.status(200).json(course)
+
+  if(course){
+    res.status(200).json(course)
+  } else {
+    next();
+  }
+
 }));
 
 
@@ -74,7 +80,7 @@ router.post('/', authenticateUser, courseInputsValidator, asyncHandler(async (re
 }));
 
 //Updates a course
-router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(req, res) => {
+router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(req, res, next) => {
 
   //Used "express validator's" validationResult method to check for possible errors
   const errors = validationResult(req);
@@ -103,16 +109,20 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
       })
       res.status(204).end();
     } else {
-      res.status(404).json({'error': "Not Found"})
+      next();
     }
   }
 }));
 
 // Deletes a course
-router.delete('/:id', authenticateUser, asyncHandler(async (req, res) => {
+router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
   const course = await Course.findByPk(req.params.id);
-  await course.destroy();
-  res.status(204).end();
+  if(course){
+    await course.destroy();
+    res.status(204).end();
+  } else {
+    next();
+  }
 }));
 
 module.exports = router;

@@ -22,8 +22,6 @@ const authenticateUser = async(req, res, next) => {
   //Parse the user's credentials from the Authorization header.
   const credentials = auth(req);
 
-  console.log(credentials);
-
   if(credentials){
 
     const users = await User.findAll()
@@ -70,10 +68,10 @@ const userInputsValidator = [
     check('password', 'Please provide a value for "Password"').exists({ checkNull: true, checkFalsy: true })
 ]
 
-const authentication = {}
-authentication.authenticateUser = authenticateUser;
-authentication.courseInputsValidator = courseInputsValidator;
-authentication.userInputsValidator = userInputsValidator;
-
+const authentication = {
+  authenticateUser,
+  courseInputsValidator,
+  userInputsValidator
+}
 
 module.exports = authentication;

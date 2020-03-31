@@ -2,8 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const auth = require('basic-auth');
+const { validationResult } = require('express-validator');
 const bcryptjs = require('bcryptjs');
 
 //import models and sequelize from  the db folder

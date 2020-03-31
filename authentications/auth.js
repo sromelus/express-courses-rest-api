@@ -57,17 +57,17 @@ const authenticateUser = async(req, res, next) => {
 
 const courseInputsValidator = [
   //Used "express validator's" check method to validate inputs
-  check("title", 'Please provide a "title"').exists(),
-  check("description", 'Please provide a "description"').exists(),
-  check("userId", 'Please provide a "userId"').exists()
+  check("title", 'Please provide a "title"').exists({checkNull: true, checkFalsy: true }),
+  check("description", 'Please provide a "description"').exists({checkNull: true, checkFalsy: true }),
+  check("userId", 'Please provide a "userId"').exists({ checkNull: true, checkFalsy: true })
 ]
 
 const userInputsValidator = [
   //Used "express validator's" check method to validate inputs
-    check('firstName', 'Please provide a value for "First Name"').exists(),
-    check('lastName', 'Please provide a value for "Last Name"').exists(),
+    check('firstName', 'Please provide a value for "First Name"').exists({ checkNull: true, checkFalsy: true }),
+    check('lastName', 'Please provide a value for "Last Name"').exists({ checkNull: true, checkFalsy: true }),
     check('emailAddress', 'Please provide a value for "Email Address"').isEmail(),
-    check('password', 'Please provide a value for "Password"').exists()
+    check('password', 'Please provide a value for "Password"').exists({ checkNull: true, checkFalsy: true })
 ]
 
 const authentication = {}

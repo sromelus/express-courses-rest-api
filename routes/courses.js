@@ -30,9 +30,13 @@ function asyncHandler(cb){
 //Returns a list of courses (including the user that owns each course)
 router.get('/', asyncHandler(async (req, res) => {
   const courses = await Course.findAll({
+    //Use attributes property to only display specific properties to the api endpoint
+    attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded', 'userId'],
     include: [{
       model: User,
-      as: 'userCourse'
+      as: 'userCourse',
+      attributes: ['id', 'firstName', 'lastName', 'emailAddress']
+
     }]
   })
   res.status(200).json(courses)
@@ -42,9 +46,11 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res, next) => {
 
   const courses = await Course.findAll({
+    attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded', 'userId'],
     include: [{
       model: User,
-      as: 'userCourse'
+      as: 'userCourse',
+      attributes: ['id', 'firstName', 'lastName', 'emailAddress']
     }]
   })
 
@@ -97,7 +103,7 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
 
  // Retrieve the course and update the specified field, if there is a course with that ID
     const course = await Course.findByPk(req.params.id);
-  
+
     if(course){
       if(req.currentUser.id === course.userId){
         await Course.update({
@@ -115,7 +121,7 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
         })
         res.status(204).end();
       } else {
-        res.status(401).json({ message: 'Access Denied'})
+        res.status(403).json({ message: 'Forbidden'})
       }
     } else {
       next();
@@ -127,8 +133,12 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
 router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
   const course = await Course.findByPk(req.params.id);
   if(course){
-    await course.destroy();
-    res.status(204).end();
+    if(req.currentUser.id === course.userId){
+      await course.destroy();
+      res.status(204).end();
+    } else {
+      res.status(403).json({ message: 'Forbidden'})
+    }
   } else {
     next();
   }

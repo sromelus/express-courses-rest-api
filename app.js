@@ -45,9 +45,15 @@ app.use((err, req, res, next) => {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
   }
 
+  if(err.name === 'SequelizeUniqueConstraintError' && err.fields.toString() === 'emailAddress'){
+    const msg = 'Sorry! An account with this email address already exists, please use another email.'
+    err.message = msg;
+    err.status = 409;
+  }
+
   res.status(err.status || 500).json({
     message: err.message,
-    error: {},
+    error: {err}
   });
 });
 

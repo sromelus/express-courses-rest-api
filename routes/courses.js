@@ -19,7 +19,7 @@ function asyncHandler(cb){
     try {
       await cb(req, res, next)
     } catch(error){
-        res.status(500).json({error});
+        next(error)
     }
   }
 }
@@ -89,25 +89,34 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
     const errorMessages = errors.array().map(error => error.msg);
     res.status(400).json({ message: errorMessages })
   } else {
+    // const user = req.currentUser
+    // console.log(user.id);
+    // console.log(course.userId);
+    // console.log(req.currentUser.id === course.userId);
+    // res.status(401).json({ message: 'Access Denied'})
 
  // Retrieve the course and update the specified field, if there is a course with that ID
     const course = await Course.findByPk(req.params.id);
-
+  
     if(course){
-      await Course.update({
-      //The validation middleware for course overrides the "||".  "||" / "OR" Allows to update just one property
-        title: req.body.title || course.title,
-        description: req.body.description || course.description,
-        estimatedTime: req.body.estimatedTime || course.estimatedTime,
-        materialsNeeded: req.body.materialsNeeded || course.materialsNeeded,
-        userId: req.body.userId || course.userId
-      },
-      {
-        where: {
-          id: req.params.id
-        }
-      })
-      res.status(204).end();
+      if(req.currentUser.id === course.userId){
+        await Course.update({
+        //The validation middleware for course overrides the "||".  "||" / "OR" Allows to update just one property
+          title: req.body.title || course.title,
+          description: req.body.description || course.description,
+          estimatedTime: req.body.estimatedTime || course.estimatedTime,
+          materialsNeeded: req.body.materialsNeeded || course.materialsNeeded,
+          userId: req.body.userId || course.userId
+        },
+        {
+          where: {
+            id: req.params.id
+          }
+        })
+        res.status(204).end();
+      } else {
+        res.status(401).json({ message: 'Access Denied'})
+      }
     } else {
       next();
     }

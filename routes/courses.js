@@ -29,6 +29,14 @@ function asyncHandler(cb){
 
 //Returns a list of courses (including the user that owns each course)
 router.get('/', asyncHandler(async (req, res) => {
+  // Check the Database connection.
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to the database successful!');
+  } catch (error) {
+    console.error('Error connecting to the database: ', error);
+  }
+
   const courses = await Course.findAll({
     //Use attributes property to only display specific properties to the api endpoint
     attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded', 'userId'],

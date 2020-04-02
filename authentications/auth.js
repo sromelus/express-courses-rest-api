@@ -6,7 +6,13 @@ const {  User  } = models;
 const auth = require('basic-auth');
 const bcryptjs = require('bcryptjs');
 
-//Middleware function to get the user credentials from the Authorization header set on the request.
+/**
+ * Middleware to authenticate the request using Basic Authentication.
+ * @param {Request} req - The Express Request object.
+ * @param {Response} res - The Express Response object.
+ * @param {Function} next - The function to call to pass execution to the next middleware.
+ */
+
 const authenticateUser = async(req, res, next) => {
 // Check the Database connection.
   try {

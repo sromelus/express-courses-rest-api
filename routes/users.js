@@ -37,7 +37,6 @@ router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     });
 }));
 
-
 router.post('/', userInputsValidator, asyncHandler(async(req, res) => {
 
   //Used "express validator's" validationResult method to check for possible errors

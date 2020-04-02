@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const Sequelize = require('sequelize');
 
 console.info('Instantiating and configuring the Sequelize object instance...');

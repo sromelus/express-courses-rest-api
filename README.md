@@ -1,7 +1,7 @@
 
 #REST API Project - With Express
 
-This project is an API that manages a mock up school database. The api currently manages two main datasets users and courses.
+This project is an API that manages a mock up school database. The api currently manages two main data sets users and courses.
 
 
 ## Getting Started

@@ -26,10 +26,9 @@ function asyncHandler(cb){
   }
 }
 
-
 //----------------------------All Routes------------------------------
 
-router.get('/', authenticateUser, asyncHandler(async (req, res) => {
+router.get("/", authenticateUser, asyncHandler(async (req, res) => {
     const user = req.currentUser;
     res.json({
       name: `${user.firstName} ${user.lastName}`,
@@ -37,7 +36,7 @@ router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     });
 }));
 
-router.post('/', userInputsValidator, asyncHandler(async(req, res) => {
+router.post("/", userInputsValidator, asyncHandler(async(req, res) => {
 
   //Used "express validator's" validationResult method to check for possible errors
   const errors = validationResult(req);
@@ -57,7 +56,7 @@ router.post('/', userInputsValidator, asyncHandler(async(req, res) => {
         password: user.password
       });
 
-   res.status(201).end()
+   res.status(201).location("/").end();
   }
 }));
 

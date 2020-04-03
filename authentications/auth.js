@@ -14,13 +14,6 @@ const bcryptjs = require('bcryptjs');
  */
 
 const authenticateUser = async(req, res, next) => {
-// Check the Database connection.
-  try {
-    await sequelize.authenticate();
-    console.log('Connection to the database successful!');
-  } catch (error) {
-    console.error('Error connecting to the database: ', error);
-  }
 
   let message = null;
   let isCredentialsNotEmpty = null;

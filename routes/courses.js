@@ -29,13 +29,6 @@ function asyncHandler(cb){
 
 //Returns a list of courses (including the user that owns each course)
 router.get('/', asyncHandler(async (req, res) => {
-  // Check the Database connection.
-  try {
-    await sequelize.authenticate();
-    console.log('Connection to the database successful!');
-  } catch (error) {
-    console.error('Error connecting to the database: ', error);
-  }
 
   const courses = await Course.findAll({
     //Use attributes property to only display specific properties to the api endpoint
@@ -89,7 +82,9 @@ router.post('/', authenticateUser, courseInputsValidator, asyncHandler(async (re
       materialsNeeded: req.body.materialsNeeded,
       userId: req.body.userId
     })
-    res.status(201).json(course)
+
+    res.location(`/api/courses/${course.id}`);
+    res.status(201).end();
   }
 }));
 
@@ -103,12 +98,7 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
     const errorMessages = errors.array().map(error => error.msg);
     res.status(400).json({ message: errorMessages })
   } else {
-    // const user = req.currentUser
-    // console.log(user.id);
-    // console.log(course.userId);
-    // console.log(req.currentUser.id === course.userId);
-    // res.status(401).json({ message: 'Access Denied'})
-
+    
  // Retrieve the course and update the specified field, if there is a course with that ID
     const course = await Course.findByPk(req.params.id);
 

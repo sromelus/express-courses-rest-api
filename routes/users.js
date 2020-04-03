@@ -30,9 +30,10 @@ function asyncHandler(cb){
 
 router.get("/", authenticateUser, asyncHandler(async (req, res) => {
     const user = req.currentUser;
-    res.json({
-      name: `${user.firstName} ${user.lastName}`,
-      email: `${user.emailAddress}`
+    res.json({ user: {
+        name: `${user.firstName} ${user.lastName}`,
+        email: `${user.emailAddress}`
+      }
     });
 }));
 

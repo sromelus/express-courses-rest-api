@@ -40,7 +40,7 @@ router.get('/', asyncHandler(async (req, res) => {
 
     }]
   })
-  res.status(200).json(courses)
+  res.status(200).json({courses: courses})
 }));
 
 //Returns a the course (including the user that owns the course) for the provided course ID
@@ -58,7 +58,7 @@ router.get('/:id', asyncHandler(async (req, res, next) => {
   const course = courses.find(course => course.id == req.params.id)
 
   if(course){
-    res.status(200).json(course)
+    res.status(200).json({course: course})
   } else {
     next();
   }
@@ -98,7 +98,7 @@ router.put('/:id', authenticateUser, courseInputsValidator, asyncHandler(async(r
     const errorMessages = errors.array().map(error => error.msg);
     res.status(400).json({ message: errorMessages })
   } else {
-    
+
  // Retrieve the course and update the specified field, if there is a course with that ID
     const course = await Course.findByPk(req.params.id);
 

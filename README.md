@@ -14,7 +14,7 @@ npm install
 
 ```
 
-Second, seed the SQLite database. 
+Second, seed the SQLite database.
 
 ```
 npm run seed
@@ -26,4 +26,4 @@ And lastly, start the application.
 npm start
 ```
 
-To test the Express server, browse to the URL http://localhost:5000/.
+To test the Express server, browse to the URL localhost:5000.

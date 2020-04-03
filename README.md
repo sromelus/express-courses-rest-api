@@ -1,4 +1,3 @@
-
 #REST API Project - With Express
 
 This project is an API that manages a mock up school database. The api currently manages two main data sets users and courses.
@@ -15,7 +14,7 @@ npm install
 
 ```
 
-Second, seed the SQLite database.
+Second, seed the SQLite database. 
 
 ```
 npm run seed
@@ -27,4 +26,4 @@ And lastly, start the application.
 npm start
 ```
 
-To test the Express server, browse to the URL [http://localhost:5000/](http://localhost:5000/).
+To test the Express server, browse to the URL http://localhost:5000/.
